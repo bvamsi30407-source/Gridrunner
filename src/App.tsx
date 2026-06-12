@@ -42,6 +42,7 @@ export default function App() {
   const [activeShield, setActiveShield] = useState<boolean>(false);
   const [scoreText, setScoreText] = useState<number>(0);
   const [crystalsCount, setCrystalsCount] = useState<number>(0);
+  const [isTouch, setIsTouch] = useState<boolean>(false);
 
   // References for low-latency game loop access
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +72,19 @@ export default function App() {
     life: number;
     maxLife: number;
   }[]>([]);
+
+  // Detect touch support to display on-screen overlays
+  useEffect(() => {
+    const checkTouch = () => {
+      setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    checkTouch();
+    // Also listen to touchstart once to be safe on some devices
+    window.addEventListener('touchstart', checkTouch, { once: true });
+    return () => {
+      window.removeEventListener('touchstart', checkTouch);
+    };
+  }, []);
 
   // Update game state ref when state changes
   useEffect(() => {
@@ -354,7 +368,7 @@ export default function App() {
     };
     constructCylinders();
 
-    // --- COMSIC CELESTIAL STARS ---
+    // --- COSMIC CELESTIAL STARS ---
     const numStars = 450;
     const starGeo = new THREE.BufferGeometry();
     const starPositions = new Float32Array(numStars * 3);
@@ -1169,10 +1183,10 @@ export default function App() {
       <div className="absolute top-4 right-4 z-40 flex items-center gap-3">
         <button
           onClick={() => setIsMuted(!isMuted)}
-          className="p-3 bg-black/60 backdrop-blur-md border border-cyan-500/20 rounded-full hover:bg-cyan-500/10 active:scale-95 transition-all text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] cursor-pointer"
+          className="p-2.5 sm:p-3 bg-black/60 backdrop-blur-md border border-cyan-500/20 rounded-full hover:bg-cyan-500/10 active:scale-95 transition-all text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] cursor-pointer"
           title={isMuted ? "Unmute Synthesizer" : "Mute Synthesizer"}
         >
-          {isMuted ? <VolumeX className="w-5 h-5 text-pink-500" /> : <Volume2 className="w-5 h-5 text-cyan-400" />}
+          {isMuted ? <VolumeX className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-pink-500" /> : <Volume2 className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-cyan-400" />}
         </button>
       </div>
 
@@ -1185,12 +1199,12 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-30 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-slate-950/80 via-black/95 to-slate-950/80 backdrop-blur-sm"
+            className="absolute inset-0 z-30 flex flex-col items-center justify-start sm:justify-center p-4 sm:p-6 bg-gradient-to-b from-slate-950/80 via-black/95 to-slate-950/80 backdrop-blur-md overflow-y-auto touch-pan-y"
           >
             {/* Retro grid lines decoration */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0.2)_1px,_transparent_1px),_linear-gradient(90deg,_rgba(18,24,38,0.2)_1px,_transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-50" />
             
-            <div className="text-center max-w-xl z-10 w-full relative">
+            <div className="text-center max-w-xl z-10 w-full relative my-auto py-4">
               <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-cyan-500/10 blur-3xl rounded-full" />
               
               {/* BRAND LOGO */}
@@ -1198,11 +1212,12 @@ export default function App() {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
+                className="landscape:mt-1"
               >
-                <h1 className="font-orbitron font-black text-5xl md:text-6xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-500 neon-text-cyan uppercase">
+                <h1 className="font-orbitron font-black text-4xl sm:text-5xl md:text-6xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-500 neon-text-cyan uppercase">
                   Gridrunner
                 </h1>
-                <p className="font-orbitron italic tracking-widest text-pink-500 text-lg md:text-xl font-bold mt-2 neon-text-pink uppercase select-none">
+                <p className="font-orbitron italic tracking-widest text-pink-500 text-sm sm:text-base md:text-lg font-bold mt-1 sm:mt-2 neon-text-pink uppercase select-none">
                   // Neon Eclipse
                 </p>
               </motion.div>
@@ -1213,9 +1228,9 @@ export default function App() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="inline-flex items-center gap-2 mt-5 px-4 py-1.5 bg-pink-500/10 border border-pink-500/30 rounded-full font-mono text-xs text-pink-400 tracking-wider shadow-[0_0_15px_rgba(236,72,153,0.15)]"
+                  className="inline-flex items-center gap-2 mt-3 sm:mt-5 landscape:mt-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-pink-500/10 border border-pink-500/30 rounded-full font-mono text-[10px] sm:text-xs text-pink-400 tracking-wider shadow-[0_0_15px_rgba(236,72,153,0.15)] animate-pulse"
                 >
-                  <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                  <Trophy className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-400" />
                   HIGH MATRIX RECORD: <span className="font-bold text-white font-orbitron">{highScore}</span>
                 </motion.div>
               )}
@@ -1225,44 +1240,44 @@ export default function App() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-8 bg-black/60 backdrop-blur-md rounded-2xl border border-cyan-500/30 p-6 text-left shadow-[0_0_25px_rgba(6,182,212,0.1)] font-sans"
+                className="mt-4 sm:mt-8 landscape:mt-3 bg-black/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-cyan-500/30 p-4 sm:p-6 text-left shadow-[0_0_25px_rgba(6,182,212,0.1)] font-sans"
               >
-                <div className="flex items-center gap-2 text-cyan-400 font-orbitron font-bold text-sm tracking-wider border-b border-cyan-500/20 pb-3 mb-4">
-                  <Keyboard className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-cyan-400 font-orbitron font-bold text-xs sm:text-sm tracking-wider border-b border-cyan-500/20 pb-2 sm:pb-3 mb-3 sm:mb-4">
+                  <Keyboard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   COGNITIVE SECTOR MANUAL
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm text-gray-300">
-                  <div className="flex items-start gap-2.5">
-                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[55px] text-center">A / D</span>
-                    <span className="text-gray-400">or</span>
-                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[55px] text-center">← / →</span>
-                    <span className="leading-tight text-gray-300 ml-1">Rotate 360° inside tube</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-300">
+                  <div className="flex items-start gap-2">
+                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-1.5 sm:px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[45px] sm:min-w-[55px] text-center text-[10px] sm:text-xs">A / D</span>
+                    <span className="text-gray-400 text-[10px] sm:text-xs">or</span>
+                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-1.5 sm:px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[45px] sm:min-w-[55px] text-center text-[10px] sm:text-xs">← / →</span>
+                    <span className="leading-tight text-gray-300 text-[11px] sm:text-xs ml-1">Rotate 360° inside tube</span>
                   </div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[55px] text-center">W</span>
-                    <span className="text-gray-400">or</span>
-                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[55px] text-center">↑</span>
-                    <span className="leading-tight text-gray-300 ml-1">Speed Nitro Boost</span>
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-1.5 sm:px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[45px] sm:min-w-[55px] text-center text-[10px] sm:text-xs">W</span>
+                    <span className="text-gray-400 text-[10px] sm:text-xs">or</span>
+                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-1.5 sm:px-2 py-0.5 font-mono text-cyan-300 font-bold shadow-sm whitespace-nowrap min-w-[45px] sm:min-w-[55px] text-center text-[10px] sm:text-xs">↑</span>
+                    <span className="leading-tight text-gray-300 text-[11px] sm:text-xs ml-1">Speed Nitro Boost</span>
                   </div>
-                  <div className="flex items-center col-span-1 md:col-span-2 gap-2.5 mt-1">
-                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-6 py-0.5 font-mono text-cyan-300 font-bold shadow-sm text-center">SPACEBAR</span>
-                    <span className="leading-tight text-gray-300 ml-1">Brief Jump to clear low grid-fences</span>
+                  <div className="flex items-center col-span-1 md:col-span-2 gap-2 mt-1">
+                    <span className="flex items-center justify-center bg-cyan-950 border border-cyan-400/40 rounded px-4 sm:px-6 py-0.5 font-mono text-cyan-300 font-bold shadow-sm text-center text-[10px] sm:text-xs">SPACEBAR</span>
+                    <span className="leading-tight text-gray-300 text-[11px] sm:text-xs ml-1">Brief Jump to clear low grid-fences</span>
                   </div>
                 </div>
 
                 {/* VISUAL DICTIONARY */}
-                <div className="mt-5 pt-4 border-t border-cyan-500/20 grid grid-cols-3 gap-2 text-[11px] font-mono text-center text-gray-400">
+                <div className="mt-4 pt-3 border-t border-cyan-500/20 grid grid-cols-3 gap-2 text-[10px] sm:text-[11px] font-mono text-center text-gray-400">
                   <div className="flex flex-col items-center gap-1">
-                    <div className="w-4 h-4 bg-red-600 rounded-sm shadow-[0_0_8px_rgba(239,68,68,0.8)] border border-red-400" />
+                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-red-600 rounded-sm shadow-[0_0_8px_rgba(239,68,68,0.8)] border border-red-400" />
                     <span>Holo Barrier</span>
                   </div>
                   <div className="flex flex-col items-center gap-1">
-                    <div className="w-4 h-2 bg-yellow-400 rounded-sm shadow-[0_0_8px_rgba(253,224,71,0.8)] border border-yellow-200 mt-1" />
+                    <div className="w-3.5 h-1.5 sm:w-4 sm:h-2 bg-yellow-400 rounded-sm shadow-[0_0_8px_rgba(253,224,71,0.8)] border border-yellow-200 mt-1" />
                     <span>Jumpable Fence</span>
                   </div>
                   <div className="flex flex-col items-center gap-1">
-                    <div className="w-4 h-4 bg-violet-600 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.8)] border border-violet-400" />
+                    <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-violet-600 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.8)] border border-violet-400" />
                     <span>EMP Hoop/Gap</span>
                   </div>
                 </div>
@@ -1273,17 +1288,17 @@ export default function App() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="mt-8"
+                className="mt-4 sm:mt-8 landscape:mt-3"
               >
                 <button
                   onClick={startGame}
-                  className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-500 to-indigo-600 rounded-xl hover:from-cyan-400 hover:to-indigo-500 text-white font-orbitron font-bold text-lg tracking-widest border border-cyan-300/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-150 transition-all shadow-[0_0_25px_rgba(6,182,212,0.45)] cursor-pointer"
+                  className="group relative inline-flex items-center gap-2.5 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-cyan-500 to-indigo-600 rounded-xl hover:from-cyan-400 hover:to-indigo-500 text-white font-orbitron font-bold text-base sm:text-lg tracking-widest border border-cyan-300/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-150 transition-all shadow-[0_0_25px_rgba(6,182,212,0.45)] cursor-pointer select-none"
                 >
-                  <Play className="w-5 h-5 fill-white text-transparent group-hover:scale-110 transition-transform duration-100" />
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-white text-transparent group-hover:scale-110 transition-transform duration-100" />
                   INITIATE SYSTEM RUN
-                  <ChevronRight className="w-5 h-5 opacity-50 group-hover:translate-x-1 duration-150 transition-transform" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 opacity-50 group-hover:translate-x-1 duration-150 transition-transform" />
                 </button>
-                <div className="text-[10px] text-cyan-400/50 mt-3 font-mono">AUTHORIZED GATEWAYS BY CRAZYGAMES // v1.2</div>
+                <div className="text-[9px] sm:text-[10px] text-cyan-400/50 mt-2 sm:mt-3 font-mono">AUTHORIZED GATEWAYS BY CRAZYGAMES // v1.2</div>
               </motion.div>
             </div>
           </motion.div>
@@ -1302,43 +1317,43 @@ export default function App() {
       >
         {/* TOP LEFT DATA CORNER */}
         <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-auto">
-          <div className="bg-black/80 backdrop-blur-md rounded-lg border border-cyan-500/20 px-4 py-2 flex items-center gap-3 shadow-[0_0_15px_rgba(6,182,212,0.1)] min-w-[190px]">
-            <div className="w-1.5 h-8 bg-cyan-500 rounded-full animate-pulse" />
+          <div className="bg-black/80 backdrop-blur-md rounded-lg border border-cyan-500/20 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3 shadow-[0_0_15px_rgba(6,182,212,0.1)] min-w-[150px] sm:min-w-[190px]">
+            <div className="w-1 h-6 sm:w-1.5 sm:h-8 bg-cyan-500 rounded-full animate-pulse" />
             <div>
-              <div className="text-[10px] font-mono text-cyan-400/50 tracking-wider leading-none">GRID DISTANCE</div>
-              <div className="text-xl font-mono font-bold tracking-widest text-cyan-400 leading-tight">
-                <span id="hud-dist-val">000000</span><span className="text-xs text-cyan-300 font-orbitron ml-1">M</span>
+              <div className="text-[8px] sm:text-[10px] font-mono text-cyan-400/50 tracking-wider leading-none">GRID DISTANCE</div>
+              <div className="text-base sm:text-xl font-mono font-bold tracking-widest text-cyan-400 leading-tight">
+                <span id="hud-dist-val">000000</span><span className="text-[10px] sm:text-xs text-cyan-300 font-orbitron ml-0.5 sm:ml-1">M</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* TOP RIGHT STORAGE COUNT */}
-        <div className="absolute top-4 right-16 flex flex-col gap-2 pointer-events-auto">
-          <div className="bg-black/80 backdrop-blur-md rounded-lg border border-emerald-500/20 px-4 py-2 flex items-center gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-            <div className="p-1 px-1.5 bg-emerald-500/10 rounded-md border border-emerald-500/30">
-              <Database className="w-4 h-4 text-emerald-400 animate-spin" style={{ animationDuration: '4s' }} />
+        <div className="absolute top-4 right-14 sm:right-16 flex flex-col gap-2 pointer-events-auto">
+          <div className="bg-black/80 backdrop-blur-md rounded-lg border border-emerald-500/20 px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 sm:gap-3 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+            <div className="p-0.5 sm:p-1 px-1 sm:px-1.5 bg-emerald-500/10 rounded-md border border-emerald-500/30">
+              <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 animate-spin" style={{ animationDuration: '4s' }} />
             </div>
             <div>
-              <div className="text-[10px] font-mono text-emerald-400/50 tracking-wider leading-none">DATA CODES</div>
-              <div className="text-lg font-mono font-bold text-emerald-400 leading-tight">
+              <div className="text-[8px] sm:text-[10px] font-mono text-emerald-400/50 tracking-wider leading-none">DATA CODES</div>
+              <div className="text-sm sm:text-lg font-mono font-bold text-emerald-400 leading-tight">
                 CUBE: <span id="hud-cubes-val">0</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* BOTTOM RIGHT INTELLIGENT SPEEDOMETER */}
-        <div className="absolute bottom-6 right-6 flex flex-col items-end pointer-events-auto max-w-[200px] w-full">
-          <div className="bg-black/85 backdrop-blur-md border border-cyan-500/25 rounded-xl p-3 w-full shadow-[0_0_20px_rgba(6,182,212,0.12)]">
+        {/* BOTTOM RIGHT INTELLIGENT SPEEDOMETER (OFFSET HEIGHT TO PREVENT MOBILE TOUCH CLASH) */}
+        <div className="absolute bottom-20 left-auto right-6 landscape:bottom-16 landscape:right-4 md:bottom-6 md:right-6 flex flex-col items-end pointer-events-auto max-w-[140px] sm:max-w-[180px] md:max-w-[200px] w-full">
+          <div className="bg-black/85 backdrop-blur-md border border-cyan-500/25 rounded-lg sm:rounded-xl p-2 sm:p-3 w-full shadow-[0_0_20px_rgba(6,182,212,0.12)]">
             <div className="flex items-baseline justify-between mb-1">
-              <span className="text-[10px] font-orbitron text-cyan-500/70 tracking-wider">SPEED</span>
-              <span className="font-mono text-xl font-black text-cyan-400">
-                <span id="hud-speed-val">0</span> <span className="text-xs text-cyan-300 font-orbitron">KM/H</span>
+              <span className="text-[8px] sm:text-[10px] font-orbitron text-cyan-500/70 tracking-wider">SPEED</span>
+              <span className="font-mono text-base sm:text-xl font-black text-cyan-400">
+                <span id="hud-speed-val">0</span> <span className="text-[10px] sm:text-xs text-cyan-300 font-orbitron">KM/H</span>
               </span>
             </div>
             {/* Speed segmented dashboard bar */}
-            <div className="w-full h-1.5 bg-slate-950 rounded overflow-hidden flex border border-cyan-500/15">
+            <div className="w-full h-1 sm:h-1.5 bg-slate-950 rounded overflow-hidden flex border border-cyan-500/15">
               <div
                 id="hud-speed-bar"
                 className="h-full bg-gradient-to-r from-cyan-500 via-sky-400 to-indigo-500 transition-all duration-75"
@@ -1348,38 +1363,38 @@ export default function App() {
           </div>
         </div>
 
-        {/* BOTTOM LEFT TUBE PERSPECTIVE ANGLE WIDGET */}
-        <div className="absolute bottom-6 left-6 pointer-events-auto flex items-center gap-3 bg-black/85 backdrop-blur-md border border-cyan-500/25 rounded-xl p-3 shadow-[0_0_20px_rgba(6,182,212,0.12)]">
-          <div className="relative w-10 h-10 rounded-full border border-cyan-500/30 flex items-center justify-center">
+        {/* BOTTOM LEFT TUBE PERSPECTIVE ANGLE WIDGET (OFFSET HEIGHT TO PREVENT MOBILE TOUCH CLASH) */}
+        <div className="absolute bottom-20 left-6 landscape:bottom-16 landscape:left-4 md:bottom-6 md:left-6 pointer-events-auto flex items-center gap-2 sm:gap-3 bg-black/85 backdrop-blur-md border border-cyan-500/25 rounded-lg sm:rounded-xl p-2 sm:p-3 shadow-[0_0_20px_rgba(6,182,212,0.12)]">
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-cyan-500/30 flex items-center justify-center">
             {/* Compass rotating indicator dot */}
             <div
               id="hud-angle-dot"
               className="absolute inset-0 transition-transform duration-75 ease-out"
               style={{ transform: 'rotate(0deg)' }}
             >
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-pink-500 shadow-[0_0_8px_rgb(236,72,153)] border border-white" />
+              <div className="absolute -top-0.5 sm:-top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-pink-500 shadow-[0_0_8px_rgb(236,72,153)] border border-white" />
             </div>
-            <div className="font-orbitron text-[9px] text-cyan-400/50 text-center uppercase tracking-tighter">GRID</div>
+            <div className="font-orbitron text-[7px] sm:text-[9px] text-cyan-400/50 text-center uppercase tracking-tighter">GRID</div>
           </div>
           <div>
-            <div className="text-[10px] font-orbitron text-cyan-400/60 leading-none mb-0.5">3D GYRO SCAN</div>
-            <div className="text-xs font-mono text-gray-400 uppercase tracking-tight">Active Tracking</div>
+            <div className="text-[8px] sm:text-[10px] font-orbitron text-cyan-400/60 leading-none mb-0.5">3D GYRO SCAN</div>
+            <div className="text-[10px] font-mono text-gray-400 uppercase tracking-tight leading-none">Active Tracking</div>
           </div>
         </div>
 
         {/* ACTIVE WEAPON / SHIELD BAR */}
         <div
           id="hud-shield-panel"
-          className="absolute top-20 left-4 bg-black/85 backdrop-blur-md border border-cyan-400 rounded-lg p-2.5 shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center gap-3 transition-all duration-200 pointer-events-auto min-w-[190px]"
+          className="absolute top-20 left-4 bg-black/85 backdrop-blur-md border border-cyan-400 rounded-lg p-2 sm:p-2.5 shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center gap-2.5 sm:gap-3 transition-all duration-200 pointer-events-auto min-w-[150px] sm:min-w-[190px]"
           style={{ opacity: activeShield ? 1 : 0 }}
         >
           <div className="p-1 px-1.5 bg-cyan-500/10 rounded border border-cyan-500/30">
-            <Shield className="w-4 h-4 text-cyan-400 animate-pulse" />
+            <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 animate-pulse" />
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-baseline mb-0.5">
-              <span className="text-[9px] font-orbitron text-cyan-400 tracking-wider">SHIELD BARRIER</span>
-              <span className="text-[10px] font-mono font-bold text-cyan-300">
+              <span className="text-[8px] sm:text-[9px] font-orbitron text-cyan-400 tracking-wider">SHIELD BARRIER</span>
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold text-cyan-300">
                 <span id="hud-shield-time">0.0</span>s
               </span>
             </div>
@@ -1396,56 +1411,69 @@ export default function App() {
         {/* FLOATING BOARDS (REWARDS SPURS) */}
         <div
           id="hud-rewards-container"
-          className="absolute bottom-24 left-6 flex flex-col gap-2 pointer-events-none z-20"
+          className="absolute bottom-32 left-4 md:bottom-24 md:left-6 flex flex-col gap-2 pointer-events-none z-20"
         />
 
         {/* SECTOR ALERT CENTERING OVERLAY */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center select-none z-10 w-full px-4">
           <div
             id="hud-alert-overlay"
-            className="font-orbitron text-md md:text-xl font-bold tracking-widest text-indigo-400 uppercase leading-normal bg-black/75 rounded border border-indigo-500/30 px-6 py-2 shadow-[0_0_25px_rgba(168,85,247,0.3)] inline-block transition-opacity duration-300 pointer-events-none"
+            className="font-orbitron text-sm md:text-xl font-bold tracking-widest text-indigo-400 uppercase leading-normal bg-black/75 rounded border border-indigo-500/30 px-5 sm:px-6 py-1.5 sm:py-2 shadow-[0_0_25px_rgba(168,85,247,0.3)] inline-block transition-opacity duration-300 pointer-events-none"
             style={{ opacity: 0 }}
           />
         </div>
 
-        {/* MOBILE CONTROLS OVERLAYS (EXPLICIT REQ CAPABILITY) */}
-        <div className="absolute inset-x-0 bottom-4 flex md:hidden justify-between px-6 pointer-events-auto">
-          {/* Direct Steer Dials */}
-          <div className="flex items-center gap-3">
-            <button
-              onTouchStart={() => setMobileKey('left', true)}
-              onTouchEnd={() => setMobileKey('left', false)}
-              className="w-14 h-14 bg-black/60 backdrop-blur-md rounded-full border border-cyan-500/20 flex items-center justify-center hover:bg-cyan-500/10 active:scale-95 text-cyan-400 font-bold shadow-md cursor-pointer pointer-events-auto"
-            >
-              ←
-            </button>
-            <button
-              onTouchStart={() => setMobileKey('right', true)}
-              onTouchEnd={() => setMobileKey('right', false)}
-              className="w-14 h-14 bg-black/60 backdrop-blur-md rounded-full border border-cyan-500/20 flex items-center justify-center hover:bg-cyan-500/10 active:scale-95 text-cyan-400 font-bold shadow-md cursor-pointer pointer-events-auto"
-            >
-              →
-            </button>
-          </div>
+        {/* MOBILE CONTROLS OVERLAYS (OPTIMIZED FOR LANDSCAPE AND PORTRAIT VIEWPORTS) */}
+        {isTouch && (
+          <div className="absolute inset-x-0 bottom-3 landscape:bottom-2 flex justify-between px-6 landscape:px-4 pointer-events-auto">
+            {/* Direct Steer Dials */}
+            <div className="flex items-center gap-3 landscape:gap-2">
+              <button
+                onTouchStart={() => setMobileKey('left', true)}
+                onTouchEnd={() => setMobileKey('left', false)}
+                onMouseDown={() => setMobileKey('left', true)}
+                onMouseUp={() => setMobileKey('left', false)}
+                className="w-14 h-14 landscape:w-11 landscape:h-11 bg-black/75 backdrop-blur-md rounded-full border border-cyan-500/30 flex items-center justify-center active:bg-cyan-500/20 active:scale-95 text-cyan-400 text-xl font-black shadow-[0_0_15px_rgba(6,182,212,0.2)] cursor-pointer select-none pointer-events-auto"
+                title="Steer Left"
+              >
+                ←
+              </button>
+              <button
+                onTouchStart={() => setMobileKey('right', true)}
+                onTouchEnd={() => setMobileKey('right', false)}
+                onMouseDown={() => setMobileKey('right', true)}
+                onMouseUp={() => setMobileKey('right', false)}
+                className="w-14 h-14 landscape:w-11 landscape:h-11 bg-black/75 backdrop-blur-md rounded-full border border-cyan-500/30 flex items-center justify-center active:bg-cyan-500/20 active:scale-95 text-cyan-400 text-xl font-black shadow-[0_0_15px_rgba(6,182,212,0.2)] cursor-pointer select-none pointer-events-auto"
+                title="Steer Right"
+              >
+                →
+              </button>
+            </div>
 
-          {/* Action hot buttons */}
-          <div className="flex items-center gap-3">
-            <button
-              onTouchStart={() => setMobileKey('space', true)}
-              onTouchEnd={() => setMobileKey('space', false)}
-              className="px-6 h-14 bg-black/60 backdrop-blur-md rounded-xl border border-cyan-500/20 flex items-center justify-center hover:bg-cyan-500/10 active:scale-95 text-cyan-400 font-orbitron font-bold shadow-md cursor-pointer pointer-events-auto"
-            >
-              JUMP
-            </button>
-            <button
-              onTouchStart={() => setMobileKey('up', true)}
-              onTouchEnd={() => setMobileKey('up', false)}
-              className="p-3 w-14 h-14 bg-black/60 backdrop-blur-md rounded-full border border-pink-500/20 flex items-center justify-center text-pink-500 hover:bg-pink-500/10 active:scale-95 shadow-md cursor-pointer pointer-events-auto"
-            >
-              <Zap className="w-5 h-5 text-pink-500" />
-            </button>
+            {/* Action hot buttons */}
+            <div className="flex items-center gap-3 landscape:gap-2">
+              <button
+                onTouchStart={() => setMobileKey('space', true)}
+                onTouchEnd={() => setMobileKey('space', false)}
+                onMouseDown={() => setMobileKey('space', true)}
+                onMouseUp={() => setMobileKey('space', false)}
+                className="px-5 landscape:px-4 h-14 landscape:h-11 bg-black/75 backdrop-blur-md rounded-xl border border-cyan-500/30 flex items-center justify-center active:bg-cyan-500/20 active:scale-95 text-cyan-400 font-orbitron font-bold text-xs sm:text-sm tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.2)] cursor-pointer select-none pointer-events-auto"
+              >
+                JUMP
+              </button>
+              <button
+                onTouchStart={() => setMobileKey('up', true)}
+                onTouchEnd={() => setMobileKey('up', false)}
+                onMouseDown={() => setMobileKey('up', true)}
+                onMouseUp={() => setMobileKey('up', false)}
+                className="w-14 h-14 landscape:w-11 landscape:h-11 bg-black/75 backdrop-blur-md rounded-full border border-pink-500/30 flex items-center justify-center text-pink-500 active:bg-pink-500/20 active:scale-95 shadow-[0_0_15px_rgba(236,72,153,0.2)] cursor-pointer select-none pointer-events-auto"
+                title="Nitro Boost"
+              >
+                <Zap className="w-5 h-5 landscape:w-4.5 landscape:h-4.5 text-pink-500" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* ==============================================
@@ -1457,26 +1485,26 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-30 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-red-950/45 via-black/95 to-slate-950 backdrop-blur-sm"
+            className="absolute inset-0 z-30 flex flex-col items-center justify-start sm:justify-center p-4 sm:p-6 bg-gradient-to-b from-red-950/45 via-black/95 to-slate-950/80 backdrop-blur-md overflow-y-auto touch-pan-y"
           >
             <div className="absolute inset-0 bg-[linear-gradient(rgba(239,68,68,0.1)_1px,_transparent_1px),_linear-gradient(90deg,_rgba(239,68,68,0.1)_1px,_transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-50" />
             
-            <div className="text-center max-w-md z-10 w-full relative">
+            <div className="text-center max-w-md z-10 w-full relative my-auto py-4">
               <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-red-500/10 blur-3xl rounded-full" />
 
               {/* CRASH HEADER */}
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="mb-8"
+                className="mb-4 sm:mb-8 landscape:mb-3"
               >
-                <div className="text-[10px] font-mono text-red-500 uppercase tracking-widest neon-text-pink p-1 bg-red-500/10 border border-red-500/30 rounded inline-block mb-3 px-3">
+                <div className="text-[9px] sm:text-[10px] font-mono text-red-500 uppercase tracking-widest neon-text-pink p-1 bg-red-500/10 border border-red-500/30 rounded inline-block mb-2 sm:mb-3 px-3">
                   DISCONNECTED FROM THE MATRIX
                 </div>
-                <h1 className="font-orbitron font-black text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 neon-text-pink tracking-tight uppercase">
+                <h1 className="font-orbitron font-black text-2xl sm:text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 neon-text-pink tracking-tight uppercase">
                   NEON CRASH DETECTED
                 </h1>
-                <p className="text-gray-400 text-xs mt-1">GRID INTEGRITY EXHAUSTED</p>
+                <p className="text-gray-400 text-[10px] sm:text-xs mt-1">GRID INTEGRITY EXHAUSTED</p>
               </motion.div>
 
               {/* DASHBOARD STATS PANEL */}
@@ -1484,41 +1512,41 @@ export default function App() {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="bg-black/80 backdrop-blur-md rounded-2xl border border-red-500/45 p-6 text-left shadow-[0_0_30px_rgba(239,68,68,0.15)] flex flex-col gap-4 font-mono text-xs text-gray-300"
+                className="bg-black/80 backdrop-blur-md rounded-xl sm:rounded-2xl border border-red-500/45 p-4 sm:p-6 text-left shadow-[0_0_30px_rgba(239,68,68,0.15)] flex flex-col gap-3 sm:gap-4 font-mono text-[11px] sm:text-xs text-gray-300"
               >
-                <div className="text-cyan-400 font-orbitron font-bold text-sm tracking-widest border-b border-red-500/20 pb-2 mb-1 flex items-center justify-between">
+                <div className="text-cyan-400 font-orbitron font-bold text-xs sm:text-sm tracking-widest border-b border-red-500/20 pb-2 mb-1 flex items-center justify-between">
                   <span>METRICS LOG</span>
-                  <span className="text-[10px] text-gray-500 text-right font-normal">SYS_RUN_ECLIPSE</span>
+                  <span className="text-[9px] sm:text-[10px] text-gray-500 text-right font-normal leading-none">SYS_RUN_ECLIPSE</span>
                 </div>
 
-                <div className="flex justify-between items-center py-1">
+                <div className="flex justify-between items-center py-0.5 sm:py-1">
                   <span className="text-gray-400 uppercase">Distance Covered</span>
-                  <span className="text-white font-bold text-sm">{Math.floor(scoreRef.current)} M</span>
+                  <span className="text-white font-bold text-xs sm:text-sm">{Math.floor(scoreRef.current)} M</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-t border-red-500/10">
+                <div className="flex justify-between items-center py-0.5 sm:py-1 border-t border-red-500/10">
                   <span className="text-gray-400 uppercase">Cubes Synthesized</span>
-                  <span className="text-emerald-400 font-bold text-sm flex items-center gap-1">
-                    <Database className="w-3.5 h-3.5" />
+                  <span className="text-emerald-400 font-bold text-xs sm:text-sm flex items-center gap-1">
+                    <Database className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     {crystalsCount}
                   </span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-t border-red-500/10">
+                <div className="flex justify-between items-center py-0.5 sm:py-1 border-t border-red-500/10">
                   <span className="text-gray-400 uppercase">Max Peak Speed</span>
-                  <span className="text-white font-bold text-sm">{Math.max(0, peakSpeedRef.current)} KM/H</span>
+                  <span className="text-white font-bold text-xs sm:text-sm">{Math.max(0, peakSpeedRef.current)} KM/H</span>
                 </div>
                 
                 {/* FINAL CALCULATED SCORE */}
-                <div className="mt-2 pt-4 border-t-2 border-red-500/20 flex justify-between items-center text-lg">
-                  <span className="font-orbitron font-bold text-cyan-400 tracking-wider">TOTAL SCORE</span>
-                  <span className="font-orbitron font-black text-rose-500 text-xl neon-text-pink">
+                <div className="mt-1 sm:mt-2 pt-3 sm:pt-4 border-t-2 border-red-500/20 flex justify-between items-center text-base sm:text-lg">
+                  <span className="font-orbitron font-bold text-cyan-400 tracking-wider text-sm sm:text-base">TOTAL SCORE</span>
+                  <span className="font-orbitron font-black text-rose-500 text-lg sm:text-xl neon-text-pink leading-none">
                     {scoreText}
                   </span>
                 </div>
 
                 {/* NEW HIGH SCORE ALERT */}
                 {scoreText > 0 && scoreText >= highScore && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/35 rounded-lg p-2.5 text-center text-yellow-300 font-bold select-none text-[11px] uppercase tracking-widest flex items-center justify-center gap-3 animate-pulse shadow-[0_0_15px_rgba(234,179,8,0.2)]">
-                    <Trophy className="w-4 h-4 text-yellow-400" />
+                  <div className="bg-yellow-500/10 border border-yellow-500/35 rounded-lg p-2 text-center text-yellow-300 font-bold select-none text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 animate-pulse shadow-[0_0_15px_rgba(234,179,8,0.2)] mt-1">
+                    <Trophy className="w-3.5 h-3.5 text-yellow-400" />
                     SYSTEM NEW HIGHSCORE GAINED!
                   </div>
                 )}
@@ -1529,19 +1557,19 @@ export default function App() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="mt-8 flex flex-col gap-3"
+                className="mt-4 sm:mt-8 landscape:mt-3 flex flex-col gap-3 w-full animate-pulse"
               >
                 <button
                   onClick={startGame}
-                  className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 hover:from-red-500 hover:to-orange-400 rounded-xl text-white font-orbitron font-bold text-sm md:text-base tracking-widest border border-red-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-150 transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] cursor-pointer"
+                  className="group relative inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 hover:from-red-500 hover:to-orange-400 rounded-xl text-white font-orbitron font-bold text-xs sm:text-sm md:text-base tracking-widest border border-red-400/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-150 transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] cursor-pointer select-none pointer-events-auto"
                 >
-                  <RotateCcw className="w-5 h-5 group-hover:rotate-45 transition-transform duration-150" />
+                  <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-45 transition-transform duration-150" />
                   REBOOT CYCLE SYSTEM
                 </button>
                 
                 <button
                   onClick={() => setGameState('menu')}
-                  className="font-orbitron uppercase text-xs text-cyan-500 hover:text-cyan-400 hover:underline transition-all duration-150 py-2 cursor-pointer pointer-events-auto"
+                  className="font-orbitron uppercase text-[10px] sm:text-xs text-cyan-500 hover:text-cyan-400 hover:underline transition-all duration-150 py-1.5 sm:py-2 cursor-pointer pointer-events-auto"
                 >
                   Return to sector bay
                 </button>
