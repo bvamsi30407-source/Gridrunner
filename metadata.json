@@ -1,0 +1,6 @@
+{
+  "name": "Gridrunner: Neon Eclipse",
+  "description": "An intense 3D cyber-cycle endless runner game set in a futuristic cyber cylinder. Rotate 360 degrees to dodge hazards and collect data cubes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
